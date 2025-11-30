@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Query Result</h2>
+<a href="/admin" class="btn btn-secondary mb-3">Back to Dashboard</a>
+
+{% if results %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                {% for col in columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in results %}
+            <tr>
+                {% for col in columns %}
+                <td>{{ row[col] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">No results found.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Faculty Dashboard</h2>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">My Profile</div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ faculty.name }}</p>
+                <p><strong>Staff ID:</strong> {{ faculty.staff_id }}</p>
+                <p><strong>Dept:</strong> {{ faculty.department }}</p>
+                <p><strong>Balance:</strong> ¥{{ card.balance }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header">Department Statistics ({{ faculty.department }})</div>
+            <div class="card-body">
+                <p><strong>Total Transactions:</strong> {{ dept_stats.count }}</p>
+                <p><strong>Total Amount:</strong> ¥{{ dept_stats.total }}</p>
+                <a href="#" class="btn btn-secondary">Export Monthly Report</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
