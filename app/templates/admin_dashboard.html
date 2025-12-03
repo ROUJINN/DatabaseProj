@@ -3,7 +3,20 @@
 {% block content %}
 <h2>Admin Dashboard</h2>
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">Management</div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">Manage Users</a>
+                    <a href="{{ url_for('admin_cards') }}" class="list-group-item list-group-item-action">Manage Cards</a>
+                    <a href="{{ url_for('admin_points') }}" class="list-group-item list-group-item-action">Manage Access Points</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
         <div class="card mb-3">
             <div class="card-header">System Queries</div>
             <div class="card-body">

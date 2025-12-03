@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Access Points</h2>
+
+<div class="card mb-3">
+    <div class="card-header">Add New Access Point</div>
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="action" value="add">
+            <div class="row">
+                <div class="col">
+                    <input type="number" class="form-control" name="point_id" placeholder="Point ID" required>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="building_name" placeholder="Building Name" required>
+                </div>
+                <div class="col">
+                    <select class="form-select" name="manager_dept" required>
+                        <option value="智能学院">智能学院</option>
+                        <option value="计算机学院">计算机学院</option>
+                        <option value="数学学院">数学学院</option>
+                        <option value="物理学院">物理学院</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Point ID</th>
+                <th>Building Name</th>
+                <th>Manager Dept</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for point in points %}
+            <tr>
+                <td>{{ point.point_id }}</td>
+                <td>{{ point.building_name }}</td>
+                <td>{{ point.manager_dept_id }}</td>
+                <td>
+                    <form method="POST" onsubmit="return confirm('Are you sure?');">
+                        <input type="hidden" name="point_id" value="{{ point.point_id }}">
+                        <input type="hidden" name="action" value="delete">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
