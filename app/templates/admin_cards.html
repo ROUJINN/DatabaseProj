@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Cards</h2>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Card ID</th>
+                <th>User ID</th>
+                <th>Status</th>
+                <th>Balance</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for card in cards %}
+            <tr>
+                <td>{{ card.card_id }}</td>
+                <td>{{ card.user_id }}</td>
+                <td>{{ card.status }}</td>
+                <td>{{ card.balance }}</td>
+                <td>
+                    <form method="POST" class="d-inline">
+                        <input type="hidden" name="card_id" value="{{ card.card_id }}">
+                        <input type="hidden" name="action" value="update">
+                        <select name="status" class="form-select form-select-sm d-inline w-auto">
+                            <option value="normal" {% if card.status == 'normal' %}selected{% endif %}>Normal</option>
+                            <option value="lost" {% if card.status == 'lost' %}selected{% endif %}>Lost</option>
+                            <option value="frozen" {% if card.status == 'frozen' %}selected{% endif %}>Frozen</option>
+                        </select>
+                        <button type="submit" class="btn btn-warning btn-sm">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

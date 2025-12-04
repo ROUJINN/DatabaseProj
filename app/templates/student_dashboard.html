@@ -13,6 +13,51 @@
                 <p><strong>Balance:</strong> ¥{{ card.balance }}</p>
             </div>
         </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Edit Profile</div>
+            <div class="card-body">
+                <form action="{{ url_for('student_update_profile') }}" method="POST">
+                    <div class="mb-2">
+                        <label>Phone</label>
+                        <input type="text" class="form-control" name="phone" value="{{ student.phone }}">
+                    </div>
+                    <div class="mb-2">
+                        <label>Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ student.email }}">
+                    </div>
+                    <div class="mb-2">
+                        <label>New Password (leave blank to keep)</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Simulate Transaction</div>
+            <div class="card-body">
+                <form action="{{ url_for('student_transaction') }}" method="POST">
+                    <div class="mb-2">
+                        <label>Type</label>
+                        <select class="form-select" name="trans_type">
+                            <option value="payment">Payment</option>
+                            <option value="recharge">Recharge</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label>Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required>
+                    </div>
+                    <div class="mb-2">
+                        <label>Merchant (for payment)</label>
+                        <input type="text" class="form-control" name="merchant" value="Canteen">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm">Submit</button>
+                </form>
+            </div>
+        </div>
     </div>
     
     <div class="col-md-8">
