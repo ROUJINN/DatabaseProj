@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Manage Access Points</h2>
+
+<!-- Add New Access Point -->
+<div class="card mb-3">
+    <div class="card-header">Add New Access Point</div>
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="action" value="add">
+            <div class="row">
+                <div class="col">
+                    <input type="number" class="form-control" name="point_id" placeholder="Point ID" required>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="building_name" placeholder="Building Name" required>
+                </div>
+                <div class="col">
+                    <select class="form-select" name="manager_dept" required>
+                        <optgroup label="Academic Depts">
+                            {% for d in academic_depts %}
+                            <option value="{{ d }}">{{ d }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Non-Academic Depts">
+                            {% for d in non_academic_depts %}
+                            <option value="{{ d }}">{{ d }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Points Table -->
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Point ID</th>
+                <th>Building Name</th>
+                <th>Manager Dept</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for point in points %}
+            <tr>
+                <td>{{ point.point_id }}</td>
+                <td>{{ point.building_name }}</td>
+                <td>{{ point.manager_dept_id }}</td>
+                <td>
+                    <!-- Edit Button -->
+                    <button class="btn btn-primary btn-sm"
+                            data-point='{{ point|tojson|safe }}'
+                            onclick="loadPointEditFromDataset(this)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editPointModal">
+                        Edit
+                    </button>
+
+                    <!-- Delete Button -->
+                    <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                        <input type="hidden" name="point_id" value="{{ point.point_id }}">
+                        <input type="hidden" name="action" value="delete">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editPointModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="old_point_id" id="edit_old_point_id">
+
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Access Point</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Point ID</label>
+            <input type="number" name="point_id" id="edit_point_id" class="form-control" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Building Name</label>
+            <input type="text" name="building_name" id="edit_building_name" class="form-control" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Manager Dept</label>
+            <select name="manager_dept" id="edit_manager_dept" class="form-select" required>
+                <optgroup label="Academic Depts">
+                    {% for d in academic_depts %}
+                    <option value="{{ d }}">{{ d }}</option>
+                    {% endfor %}
+                </optgroup>
+                <optgroup label="Non-Academic Depts">
+                    {% for d in non_academic_depts %}
+                    <option value="{{ d }}">{{ d }}</option>
+                    {% endfor %}
+                </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function loadPointEditFromDataset(btn) {
+    const point = JSON.parse(btn.dataset.point);
+    document.getElementById("edit_old_point_id").value = point.point_id;
+    document.getElementById("edit_point_id").value = point.point_id;
+    document.getElementById("edit_building_name").value = point.building_name;
+    document.getElementById("edit_manager_dept").value = point.manager_dept_id;
+}
+</script>
+
+{% endblock %}

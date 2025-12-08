@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Faculty Dashboard</h2>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">My Profile</div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ faculty.name }}</p>
+                <p><strong>Staff ID:</strong> {{ faculty.staff_id }}</p>
+                <p><strong>Gender:</strong> {{ faculty.gender }}</p>
+                <p><strong>Dept:</strong> {{ faculty.department }}</p>
+                <p><strong>Phone:</strong> {{ faculty.phone }}</p>
+                <p><strong>Email:</strong> {{ faculty.email }}</p>
+                <p><strong>Identity Card:</strong> {{ faculty.identity_card }}</p>
+                <p><strong>Balance:</strong> ¥{{ card.balance }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Edit Profile</div>
+            <div class="card-body">
+                <form action="{{ url_for('faculty_update_profile') }}" method="POST">
+                    <div class="mb-2">
+                        <label>Phone</label>
+                        <input type="text" class="form-control" name="phone" value="{{ faculty.phone }}">
+                    </div>
+                    <div class="mb-2">
+                        <label>Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ faculty.email }}">
+                    </div>
+                    <div class="mb-2">
+                        <label>New Password (leave blank to keep)</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">My Recent Activity</div>
+            <div class="card-body">
+                <h6>Transactions</h6>
+                    <table class="table table-sm">
+                        <thead><tr><th>Time</th><th>Merchant</th><th>Amount</th></tr></thead>
+                        <tbody>
+                            {% for t in personal_transactions %}
+                            <tr><td>{{ t.time }}</td><td>{{ t.merchant_name }}</td><td>¥{{ t.amount }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="{{ url_for('faculty_all_transactions') }}" class="btn btn-link btn-sm">View All Transactions</a>
+
+                    <h6>Access Logs</h6>
+                    <table class="table table-sm">
+                        <thead><tr><th>Time</th><th>Location</th><th>Direction</th></tr></thead>
+                        <tbody>
+                            {% for log in personal_logs %}
+                            <tr><td>{{ log.time }}</td><td>{{ log.building_name }}</td><td>{{ log.direction }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="{{ url_for('faculty_all_access_logs') }}" class="btn btn-link btn-sm">View All Access Logs</a>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header">Department Statistics ({{ faculty.department }})</div>
+            <div class="card-body">
+                <p><strong>Total Transactions:</strong> {{ dept_stats.count }}</p>
+                <p><strong>Total Amount:</strong> ¥{{ dept_stats.total }}</p>
+                <a href="{{ url_for('faculty_export_report') }}" class="btn btn-secondary">Export Monthly Report</a>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header">Department Access Report ({{ faculty.department }})</div>
+            <div class="card-body">
+                <p><strong>Total Access Records:</strong> {{ dept_access_stats.count }}</p>
+                <p><strong>Unique Users:</strong> {{ dept_access_stats.users }}</p>
+                <p><strong>Most Frequent Location:</strong> {{ dept_access_stats.top_location }}</p>
+
+                <a href="{{ url_for('faculty_export_access_report') }}" class="btn btn-secondary">
+                    Export Access Report
+                </a>
+            </div>
+        </div>
+
+
+        <div class="card mb-3">
+            <div class="card-header">Manage Student Cards ({{ faculty.department }})</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Card ID</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in dept_students %}
+                        <tr>
+                            <td>{{ s.name }} ({{ s.student_id }})</td>
+                            <td>{{ s.card_id }}</td>
+                            <td>{{ s.status }}</td>
+                            <td>
+                                <form action="{{ url_for('faculty_update_card_status') }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="card_id" value="{{ s.card_id }}">
+                                    <select name="status" class="form-select form-select-sm d-inline w-auto">
+                                        <option value="normal" {% if s.status == 'normal' %}selected{% endif %}>Normal</option>
+                                        <option value="lost" {% if s.status == 'lost' %}selected{% endif %}>Lost</option>
+                                        <option value="frozen" {% if s.status == 'frozen' %}selected{% endif %}>Frozen</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-warning btn-sm">Request</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Cards</h2>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Card ID</th>
+                <th>User ID</th>
+                <th>Role</th>
+                <th>Student/Staff ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Department</th>
+                <th>Open Date</th>
+                <th>Status</th>
+                <th>Balance</th>
+                <th>Subsidy</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in cards %}
+            <tr>
+                <td>{{ c.card_id }}</td>
+                <td>{{ c.user_id }}</td>
+                <td>{{ c.role }}</td>
+
+                <td>
+                    {% if c.role == 'student' %}
+                        {{ c.student_id }}
+                    {% elif c.role == 'faculty' %}
+                        {{ c.staff_id }}
+                    {% else %}-{% endif %}
+                </td>
+
+                <td>
+                    {% if c.role == 'student' %}
+                        {{ c.student_name }}
+                    {% elif c.role == 'faculty' %}
+                        {{ c.faculty_name }}
+                    {% else %}-{% endif %}
+                </td>
+
+                <td>
+                    {% if c.role == 'student' %}
+                        {{ c.student_gender }}
+                    {% elif c.role == 'faculty' %}
+                        {{ c.faculty_gender }}
+                    {% else %}-{% endif %}
+                </td>
+
+                <td>
+                    {% if c.role == 'student' %}
+                        {{ c.student_dept }}
+                    {% elif c.role == 'faculty' %}
+                        {{ c.faculty_dept }}
+                    {% else %}-{% endif %}
+                </td>
+
+                <td>{{ c.open_date }}</td>
+                <td>{{ c.status }}</td>
+                <td>{{ c.balance }}</td>
+                <td>{{ c.subsidy_balance }}</td>
+
+                <td>
+                    <button class="btn btn-primary btn-sm"
+                            data-card='{{ c|tojson }}'
+                            onclick="loadCardEditFromDataset(this)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#cardEditModal">
+                        Edit
+                    </button>
+                </td>
+
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function loadCardEditFromDataset(btn) {
+    const card = JSON.parse(btn.dataset.card);
+    loadCardEdit(card);
+}
+
+function loadCardEdit(card) {
+    try {
+        document.getElementById("old_card_id").value = card.card_id; // 原来的 ID
+        document.getElementById("edit_card_id").value = card.card_id; // 当前可编辑
+        document.getElementById("edit_status").value = card.status;
+        document.getElementById("edit_balance").value = card.balance;
+        document.getElementById("edit_subsidy").value = card.subsidy_balance || card.subsidy;
+        document.getElementById("edit_open_date").value = card.open_date.split(" ")[0];
+    } catch (err) {
+        console.error("loadCardEdit error:", err);
+        alert("Failed to load card data (check console)");
+    }
+}
+
+</script>
+
+
+<!-- Edit Card Modal -->
+<div class="modal fade" id="cardEditModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form method="POST">
+        <input type="hidden" name="action" value="update">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Card</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Hidden original card_id for update reference -->
+            <input type="hidden" name="old_card_id" id="old_card_id">
+
+            <div class="mb-2">
+            <label class="form-label">Card ID</label>
+            <input type="text" name="card_id" id="edit_card_id" class="form-control">
+            </div>
+
+            
+          
+          <div class="mb-2">
+            <label class="form-label">Open Date</label>
+            <input type="date" name="open_date" id="edit_open_date" class="form-control">
+            </div>
+
+
+          <div class="mb-2">
+            <label class="form-label">Status</label>
+            <select name="status" id="edit_status" class="form-select">
+              <option value="normal">Normal</option>
+              <option value="lost">Lost</option>
+              <option value="frozen">Frozen</option>
+            </select>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Balance</label>
+            <input type="number" step="0.01" name="balance" id="edit_balance" class="form-control">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Subsidy</label>
+            <input type="number" step="0.01" name="subsidy_balance" id="edit_subsidy" class="form-control">
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %}

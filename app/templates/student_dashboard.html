@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Student Dashboard</h2>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">My Profile</div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ student.name }}</p>
+                <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+                <p><strong>Gender:</strong> {{ student.gender }}</p>
+                <p><strong>Dept:</strong> {{ student.department }}</p>
+                <p><strong>Grade:</strong> {{ student.grade }}</p>
+                <p><strong>Phone:</strong> {{ student.phone }}</p>
+                <p><strong>Email:</strong> {{ student.email }}</p>
+                <p><strong>Identity Card:</strong> {{ student.identity_card }}</p>
+                <p><strong>Balance:</strong> ¥{{ card.balance }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Edit Profile</div>
+            <div class="card-body">
+                <form action="{{ url_for('student_update_profile') }}" method="POST">
+                    <div class="mb-2">
+                        <label>Phone</label>
+                        <input type="text" class="form-control" name="phone" value="{{ student.phone }}">
+                    </div>
+                    <div class="mb-2">
+                        <label>Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ student.email }}">
+                    </div>
+                    <div class="mb-2">
+                        <label>New Password (leave blank to keep)</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Simulate Transaction</div>
+            <div class="card-body">
+                <form action="{{ url_for('student_transaction') }}" method="POST">
+                    <div class="mb-2">
+                        <label>Type</label>
+                        <select class="form-select" name="trans_type">
+                            <option value="payment">Payment</option>
+                            <option value="recharge">Recharge</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label>Time (optional)</label>
+                        <input type="datetime-local" class="form-control" name="time">
+                        <small class="text-muted">Leave blank to use current time</small>
+                    </div>
+
+
+                    <div class="mb-2">
+                        <label>Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required>
+                    </div>
+                    <div class="mb-2">
+                        <label>Merchant (only for payment)</label>
+                        <input type="text" class="form-control" name="merchant" id="merchant-input" value="Canteen">
+                    </div>
+
+                    <script>
+                    document.querySelector('select[name="trans_type"]').addEventListener('change', function() {
+                        if (this.value === "recharge") {
+                            document.getElementById("merchant-input").style.display = "none";
+                        } else {
+                            document.getElementById("merchant-input").style.display = "block";
+                        }
+                    });
+                    </script>
+
+                    <button type="submit" class="btn btn-success btn-sm">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- Recent Transactions -->
+        <div class="card mb-3">
+            <div class="card-header">Recent Transactions</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Merchant</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>{{ t.time }}</td>
+                            <td>{{ t.merchant_name }}</td>
+                            <td>¥{{ t.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ url_for('student_all_transactions') }}" class="btn btn-link btn-sm">View All Transactions</a>
+            </div>
+        </div>
+
+        <!-- Recent Access Logs -->
+        <div class="card mb-3">
+            <div class="card-header">Recent Access Logs</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Location</th>
+                            <th>Direction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.time }}</td>
+                            <td>{{ log.building_name }}</td>
+                            <td>{{ log.direction }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ url_for('student_all_access_logs') }}" class="btn btn-link btn-sm">View All Access Logs</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

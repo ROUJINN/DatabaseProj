@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">Management</div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">Manage Users</a>
+                    <a href="{{ url_for('admin_cards') }}" class="list-group-item list-group-item-action">Manage Cards</a>
+                    <a href="{{ url_for('admin_points') }}" class="list-group-item list-group-item-action">Manage Access Points</a>
+                    <a href="{{ url_for('admin_terminals') }}" class="list-group-item list-group-item-action">Manage Terminals</a>
+                    <a href="{{ url_for('admin_access_rights') }}" class="list-group-item list-group-item-action">Manage Access Rights</a>
+                    <a href="{{ url_for('admin_card_requests') }}" class="list-group-item list-group-item-action">Card Status Requests</a>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header">System Queries</div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="/admin/query/1" class="list-group-item list-group-item-action">1. Find "Wang X Ming" Consumption</a>
+                    <a href="/admin/query/2" class="list-group-item list-group-item-action">2. Below Average Spenders</a>
+                    <a href="/admin/query/3" class="list-group-item list-group-item-action">3. Top 10 Spenders (Post Dec 15)</a>
+                    <a href="/admin/query/4" class="list-group-item list-group-item-action">4. Busiest Access Point</a>
+                    <a href="/admin/query/5" class="list-group-item list-group-item-action">5. Smart Dept Max Merchant</a>
+                    <a href="/admin/query/6" class="list-group-item list-group-item-action">6. High Frequency Users</a>
+                    <a href="/admin/query/7" class="list-group-item list-group-item-action">7. CS Dept Night Access</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

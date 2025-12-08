@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>All Access Logs</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Location</th>
+            <th>Direction</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.time }}</td>
+            <td>{{ log.building_name }}</td>
+            <td>{{ log.direction }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary btn-sm">Back to Dashboard</a>
+{% endblock %}
