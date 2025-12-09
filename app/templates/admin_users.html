@@ -2,13 +2,86 @@
 
 {% block content %}
 <h2>Manage Users</h2>
+
+<!-- Add User Form -->
+<div class="card mb-3">
+    <div class="card-header">Add New User</div>
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="action" value="add">
+            <div class="row mb-2">
+                <div class="col">
+                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                </div>
+                <div class="col">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                </div>
+                <div class="col">
+                    <select class="form-select" name="role" id="roleSelect" required>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Extra fields for student/faculty -->
+            <div id="extraFields">
+                <div class="row mb-2">
+                    <div class="col">
+                        <input type="text" class="form-control" name="student_id" placeholder="Student ID">
+                        <input type="text" class="form-control" name="staff_id" placeholder="Staff ID" style="display:none;">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="name" placeholder="Full Name">
+                    </div>
+                    <div class="col">
+                        <select class="form-select" name="gender">
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="identity_card" placeholder="ID Card">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="department" placeholder="Department">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="phone" placeholder="Phone">
+                    </div>
+                    <div class="col">
+                        <input type="email" class="form-control" name="email" placeholder="Email">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="grade" placeholder="Grade (Student only)">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">Add User</button>
+        </form>
+
+    </div>
+</div>
+
+<!-- Users Table -->
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>User ID</th>
                 <th>Username</th>
+                <th>UserPassword</th>
                 <th>Role</th>
+                <th>Student/Staff ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Grade</th>
+                <th>Identity Card</th>
+                <th>Department</th>
+                <th>Phone</th>
+                <th>Email</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -17,17 +90,268 @@
             <tr>
                 <td>{{ user.user_id }}</td>
                 <td>{{ user.username }}</td>
+                <td>{{ user.password }}</td>
                 <td>{{ user.role }}</td>
                 <td>
-                    <form method="POST" onsubmit="return confirm('Are you sure?');">
-                        <input type="hidden" name="user_id" value="{{ user.user_id }}">
-                        <input type="hidden" name="action" value="delete">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
+                    {% if user.role == 'student' %}
+                        {{ user.student_id }}
+                    {% elif user.role == 'faculty' %}
+                        {{ user.staff_id }}
+                    {% else %}
+                        -
+                    {% endif %}
                 </td>
+                <td>
+                    {% if user.role == 'student' %}
+                        {{ user.student_name }}
+                    {% elif user.role == 'faculty' %}
+                        {{ user.faculty_name }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.role == 'student' %}
+                        {{ user.student_gender }}
+                    {% elif user.role == 'faculty' %}
+                        {{ user.faculty_gender }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.role == 'student' %}
+                        {{ user.student_grade }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.role == 'student' %}
+                        {{ user.student_id_card }}
+                    {% elif user.role == 'faculty' %}
+                        {{ user.faculty_id_card }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.role == 'student' %}
+                        {{ user.student_dept }}
+                    {% elif user.role == 'faculty' %}
+                        {{ user.faculty_dept }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.role == 'student' %}
+                        {{ user.student_phone }}
+                    {% elif user.role == 'faculty' %}
+                        {{ user.faculty_phone }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.role == 'student' %}
+                        {{ user.student_email }}
+                    {% elif user.role == 'faculty' %}
+                        {{ user.faculty_email }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                <!-- Edit button -->
+                <button class="btn btn-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal"
+                        data-user='{{ user|tojson|safe }}'
+                        onclick="loadEditFormFromDataset(this)">
+                    Edit
+                </button>
+
+
+
+                <!-- Delete -->
+                <form method="POST" class="d-inline">
+                    <input type="hidden" name="user_id" value="{{ user.user_id }}">
+                    <input type="hidden" name="action" value="delete">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+
+
+<script>
+    function loadEditForm(user) {
+    document.getElementById("edit_user_id").value = user.user_id;
+    document.getElementById("edit_username").value = user.username;
+    document.getElementById("edit_password").value = user.password;
+
+    if (user.role === "admin") {
+        document.getElementById("studentFacultyFields").style.display = "none";
+        return;
+    }
+
+    document.getElementById("studentFacultyFields").style.display = "block";
+
+    if (user.role === "student") {
+        document.getElementById("edit_name").value = user.student_name;
+        document.getElementById("edit_gender").value = user.student_gender;
+        document.getElementById("edit_identity_card").value = user.student_id_card;
+        document.getElementById("edit_department").value = user.student_dept;
+        document.getElementById("edit_phone").value = user.student_phone;
+        document.getElementById("edit_email").value = user.student_email;
+        document.getElementById("edit_grade").value = user.student_grade;
+        document.getElementById("gradeField").style.display = "block";
+    } else {
+        document.getElementById("edit_name").value = user.faculty_name;
+        document.getElementById("edit_gender").value = user.faculty_gender;
+        document.getElementById("edit_identity_card").value = user.faculty_id_card;
+        document.getElementById("edit_department").value = user.faculty_dept;
+        document.getElementById("edit_phone").value = user.faculty_phone;
+        document.getElementById("edit_email").value = user.faculty_email;
+        document.getElementById("gradeField").style.display = "none";
+        }
+    }
+
+    function loadEditFormFromDataset(elem) {
+    try {
+        const user = JSON.parse(elem.dataset.user);
+        loadEditForm(user); // 你已有的填表函数
+    } catch (e) {
+        console.error("loadEditFormFromDataset error:", e);
+        alert("Failed to load user data (console for details).");
+    }
+    }
+
+    const roleSelect = document.getElementById('roleSelect');
+    const studentInput = document.querySelector('input[name="student_id"]');
+    const staffInput = document.querySelector('input[name="staff_id"]');
+    const gradeInput = document.querySelector('input[name="grade"]');
+    const extraFields = document.getElementById('extraFields');
+    
+    function toggleFields() {
+        if (roleSelect.value === 'student') {
+            studentInput.style.display = 'inline-block';
+            staffInput.style.display = 'none';
+            gradeInput.style.display = 'inline-block';
+            extraFields.style.display = 'block';
+        } else if (roleSelect.value === 'faculty') {
+            studentInput.style.display = 'none';
+            staffInput.style.display = 'inline-block';
+            gradeInput.style.display = 'none';
+            extraFields.style.display = 'block';
+        } else { // admin
+            studentInput.style.display = 'none';
+            staffInput.style.display = 'none';
+            gradeInput.style.display = 'none';
+            extraFields.style.display = 'none';
+        }
+    }
+
+    roleSelect.addEventListener('change', toggleFields);
+    window.addEventListener('load', toggleFields);
+</script>
+
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <form method="POST">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" id="edit_user_id" name="user_id">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row mb-2">
+                        <div class="col">
+                            <label>Username</label>
+                            <input type="text" class="form-control" id="edit_username" name="username">
+                        </div>
+                        <div class="col">
+                            <label>Password</label>
+                            <input type="text" class="form-control" id="edit_password" name="password">
+                        </div>
+                    </div>
+
+                    <!-- Student / Faculty shared fields -->
+                    <div id="studentFacultyFields">
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label>Name</label>
+                                <input type="text" class="form-control" id="edit_name" name="name">
+                            </div>
+                            <div class="col">
+                                <label>Gender</label>
+                                <select class="form-select" id="edit_gender" name="gender">
+                                    <option value="M">M</option>
+                                    <option value="F">F</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label>ID Card</label>
+                                <input type="text" class="form-control" id="edit_identity_card" name="identity_card">
+                            </div>
+                            <div class="col">
+                                <label>Department</label>
+                                <input type="text" class="form-control" id="edit_department" name="department">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label>Phone</label>
+                                <input type="text" class="form-control" id="edit_phone" name="phone">
+                            </div>
+                            <div class="col">
+                                <label>Email</label>
+                                <input type="email" class="form-control" id="edit_email" name="email">
+                            </div>
+                        </div>
+
+                        <!-- Student-only -->
+                        <div class="row mb-2" id="gradeField">
+                            <div class="col">
+                                <label>Grade</label>
+                                <input type="text" class="form-control" id="edit_grade" name="grade">
+                            </div>
+                        </div>
+
+                    </div> <!-- END studentFacultyFields -->
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}

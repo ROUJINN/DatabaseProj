@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS Students (
     user_id INT UNIQUE NOT NULL,
     name VARCHAR(50) NOT NULL,
     gender ENUM('M', 'F') NOT NULL,
+    identity_card VARCHAR(20) UNIQUE NOT NULL,
     phone VARCHAR(20),
     email VARCHAR(100),
     department VARCHAR(50) NOT NULL,
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS Faculty (
     staff_id VARCHAR(20) PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
     name VARCHAR(50) NOT NULL,
+    gender ENUM('M', 'F') NOT NULL,
     identity_card VARCHAR(20) UNIQUE NOT NULL,
     phone VARCHAR(20),
     email VARCHAR(100),
@@ -62,7 +64,33 @@ CREATE TABLE IF NOT EXISTS Transactions (
     merchant_name VARCHAR(50),
     time DATETIME NOT NULL,
     FOREIGN KEY (card_id) REFERENCES Cards(card_id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    
 );
+
+
+-- Terminals Table: 管理各商户消费终端及扣费规则
+CREATE TABLE IF NOT EXISTS Terminals (
+    terminal_id VARCHAR(20) PRIMARY KEY,         -- 终端编号
+    merchant_name VARCHAR(50) NOT NULL,         -- 商户名称
+    category VARCHAR(20) DEFAULT 'general',     -- 类别：食堂/超市/洗浴等
+    charge_rule VARCHAR(100),                   -- 扣费规则描述，例如JSON或文本
+    manager_dept VARCHAR(50)                     -- 管理该终端的部门
+);
+
+
+-- AccessRights Table: 管理门禁访问权限（按个人或部门）
+CREATE TABLE IF NOT EXISTS AccessRights (
+    right_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_type ENUM('student','faculty','department') NOT NULL, -- 授权对象类型
+    role_value VARCHAR(50) NOT NULL,                            -- 授权对象：student_id / staff_id / department_name
+    point_id INT NOT NULL,                                      -- 门禁点ID
+    FOREIGN KEY (point_id) REFERENCES AccessPoints(point_id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+);
+
 
 -- Access Logs Table
 CREATE TABLE IF NOT EXISTS AccessLogs (
@@ -71,8 +99,12 @@ CREATE TABLE IF NOT EXISTS AccessLogs (
     point_id INT NOT NULL,
     direction ENUM('in', 'out') NOT NULL,
     time DATETIME NOT NULL,
-    FOREIGN KEY (card_id) REFERENCES Cards(card_id),
+    FOREIGN KEY (card_id) REFERENCES Cards(card_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     FOREIGN KEY (point_id) REFERENCES AccessPoints(point_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- User Messages (For Trigger Output)
@@ -80,8 +112,26 @@ CREATE TABLE IF NOT EXISTS UserMessages (
     msg_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     message TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_messages_user
+        FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS CardStatusRequests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    card_id VARCHAR(20) NOT NULL,
+    requested_by INT NOT NULL,           -- 教职工 user_id
+    new_status ENUM('normal','lost','frozen') NOT NULL,
+    request_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    approved_by INT,                     -- admin user_id
+    approved_time DATETIME,
+    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    FOREIGN KEY (card_id) REFERENCES Cards(card_id) ON DELETE CASCADE,
+    FOREIGN KEY (requested_by) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (approved_by) REFERENCES Users(user_id) ON DELETE SET NULL
+);
+
 
 -- Indexes for Optimization
 CREATE INDEX idx_trans_time ON Transactions(time);
