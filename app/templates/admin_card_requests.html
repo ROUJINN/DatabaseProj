@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Card Status Requests</h2>
+
+{% if requests %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Card ID</th>
+            <th>Requested By</th>
+            <th>New Status</th>
+            <th>Request Time</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in requests %}
+        <tr>
+            <td>{{ r.card_id }}</td>
+            <td>{{ r.faculty_name }}</td>
+            <td>{{ r.new_status }}</td>
+            <td>{{ r.request_time }}</td>
+            <td>
+                <form method="POST" class="d-inline">
+                    <input type="hidden" name="request_id" value="{{ r.request_id }}">
+                    <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No pending requests.</p>
+{% endif %}
+
+{% endblock %}

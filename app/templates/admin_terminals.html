@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Terminals</h2>
+
+<div class="card mb-3">
+    <div class="card-header">Add / Update Terminal</div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="row g-2">
+                <div class="col">
+                    <input type="text" class="form-control" name="terminal_id" placeholder="Terminal ID" required>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="merchant_name" placeholder="Merchant Name" required>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="category" placeholder="Category" required>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="charge_rule" placeholder="Charge Rule" required>
+                </div>
+                <div class="col">
+                    <select class="form-select" name="manager_dept" required>
+                        <option value="智能学院">智能学院</option>
+                        <option value="计算机学院">计算机学院</option>
+                        <option value="数学学院">数学学院</option>
+                        <option value="学工部">学工部</option>
+                        <option value="校务部">校务部</option>
+                        <option value="后勤部">后勤部</option>
+                        <option value="保卫处">保卫处</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <button type="submit" name="action" value="add" class="btn btn-success">Add</button>
+                    <button type="submit" name="action" value="update" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Terminal ID</th>
+                <th>Merchant Name</th>
+                <th>Category</th>
+                <th>Charge Rule</th>
+                <th>Manager Dept</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in terminals %}
+            <tr>
+                <td>{{ t.terminal_id }}</td>
+                <td>{{ t.merchant_name }}</td>
+                <td>{{ t.category }}</td>
+                <td>{{ t.charge_rule }}</td>
+                <td>{{ t.manager_dept }}</td>
+                <td>
+                    <form method="POST" onsubmit="return confirm('Are you sure to delete this terminal?');">
+                        <input type="hidden" name="terminal_id" value="{{ t.terminal_id }}">
+                        <button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

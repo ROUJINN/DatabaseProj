@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Access Rights</h2>
+
+<div class="card mb-3">
+    <div class="card-header">Add Access Right</div>
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="action" value="add">
+            <div class="row g-2">
+                <div class="col">
+                    <select class="form-select" name="role_type" required>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select class="form-select" name="role_value" required>
+                        {% for s in students %}
+                        <option value="{{ s.student_id }}">{{ s.name }} ({{ s.student_id }})</option>
+                        {% endfor %}
+                        {% for f in faculty %}
+                        <option value="{{ f.staff_id }}">{{ f.name }} ({{ f.staff_id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <select class="form-select" name="point_id" required>
+                        {% for p in points %}
+                        <option value="{{ p.point_id }}">{{ p.building_name }} (ID: {{ p.point_id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Role Type</th>
+                <th>Role Value</th>
+                <th>User Name</th>
+                <th>Point ID</th>
+                <th>Building</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in rights %}
+            <tr>
+                <td>{{ r.role_type }}</td>
+                <td>{{ r.role_value }}</td>
+                <td>{{ r.student_name if r.role_type=='student' else r.faculty_name }}</td>
+                <td>{{ r.point_id }}</td>
+                <td>{{ r.building_name }}</td>
+                <td>
+                    <form method="POST" onsubmit="return confirm('Are you sure to remove this access right?');">
+                        <input type="hidden" name="role_type" value="{{ r.role_type }}">
+                        <input type="hidden" name="role_value" value="{{ r.role_value }}">
+                        <input type="hidden" name="point_id" value="{{ r.point_id }}">
+                        <button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
