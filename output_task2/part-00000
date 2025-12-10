@@ -1,0 +1,13 @@
+Top 10 Users by Total Operation Count:	
+Rank  Username             Total      Details	
+------------------------------------------------------------	
+1     stu2                 26         access-out: 7, pay: 14, access-in: 5	
+2     stu28                26         access-out: 4, pay: 19, access-in: 3	
+3     stu3                 25         access-out: 6, pay: 17, access-in: 2	
+4     stu7                 25         pay: 20, access-in: 3, access-out: 2	
+5     fac3                 24         access-in: 6, access-out: 5, pay: 13	
+6     fac4                 24         access-in: 3, pay: 15, access-out: 6	
+7     fac6                 24         pay: 17, access-out: 5, access-in: 2	
+8     stu13                24         access-in: 6, access-out: 7, pay: 11	
+9     stu21                24         pay: 13, access-out: 6, access-in: 5	
+10    stu22                24         access-out: 8, access-in: 3, pay: 13	
