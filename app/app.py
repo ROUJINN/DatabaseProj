@@ -15,13 +15,13 @@ from flask import (
 )
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # Change this for production
+app.secret_key = "your_secret_key" 
 
 # Database Configuration
 db_config = {
     "host": "localhost",
     "user": "root",
-    "password": "123456",  # UPDATE THIS
+    "password": "123456",  
     "database": "smart_campus",
     "cursorclass": pymysql.cursors.DictCursor,
 }
@@ -102,9 +102,8 @@ def register():
                     )
                     card_id = f"CARD{id_num}"
                 elif role == "faculty":
-                    # For faculty, we need identity_card. Let's just use id_num for simplicity or ask for it.
-                    # Assuming id_num is staff_id. We'll generate a fake identity_card for now or ask in form.
-                    # To keep it simple, we'll use id_num as identity_card too if not provided.
+                    #  identity_card. use id_num for simplicity .
+                    #  use id_num as identity_card if not provided.
                     cursor.execute(
                         "INSERT INTO Faculty (staff_id, user_id, name, identity_card, phone, email, department) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                         (id_num, user_id, name, id_num, phone, email, dept),
@@ -468,7 +467,7 @@ def faculty_dashboard():
             )
             dept_stats = cursor.fetchone()
 
-            # ===== 4. Department Access Stats (修复后的版本) =====
+            # ===== 4. Department Access Stats =====
             cursor.execute(
                 """
                 SELECT 
@@ -740,13 +739,13 @@ def faculty_export_access_report():
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            # ① 获取教师所属学院
+            #获取教师所属学院
             cursor.execute(
                 "SELECT department FROM Faculty WHERE user_id=%s", (session["user_id"],)
             )
             dept = cursor.fetchone()["department"]
 
-            # ② 查询该院学生的通行记录
+            #查询该院学生的通行记录
             cursor.execute(
                 """
                 SELECT 
@@ -766,7 +765,7 @@ def faculty_export_access_report():
             )
             access_records = cursor.fetchall()
 
-            # ③ 写入 CSV
+            #写入 CSV
             si = io.StringIO()
             cw = csv.writer(si)
             cw.writerow(["Student ID", "Name", "Time", "Direction", "Location"])
@@ -782,7 +781,7 @@ def faculty_export_access_report():
                     ]
                 )
 
-            # ④ 返回 CSV 文件
+            #返回 CSV 文件
             output = make_response(si.getvalue())
             output.headers["Content-Disposition"] = (
                 "attachment; filename=access_report.csv"
@@ -819,14 +818,14 @@ def admin_users():
                 if action == "delete":
                     user_id = request.form["user_id"]
 
-                    # 1. 找到该用户的卡片
+                    # 找到该用户的卡片
                     cursor.execute(
                         "SELECT card_id FROM Cards WHERE user_id=%s", (user_id,)
                     )
                     cards = cursor.fetchall()
                     card_ids = [c["card_id"] for c in cards]
 
-                    # 2. 删除 AccessLogs 中对应卡片的记录
+                    # 删除 AccessLogs 中对应卡片的记录
                     if card_ids:
                         format_strings = ",".join(["%s"] * len(card_ids))
                         cursor.execute(
@@ -834,10 +833,10 @@ def admin_users():
                             tuple(card_ids),
                         )
 
-                    # 3. 删除 Cards
+                    # 删除 Cards
                     cursor.execute("DELETE FROM Cards WHERE user_id=%s", (user_id,))
 
-                    # 4. 删除 AccessRights 中 role_value 对应的条目（学生或教师）
+                    # 删除 AccessRights 中 role_value 对应的条目（学生或教师）
                     cursor.execute(
                         "SELECT role FROM Users WHERE user_id=%s", (user_id,)
                     )
@@ -853,11 +852,11 @@ def admin_users():
                             (user_id,),
                         )
 
-                    # 5. 删除学生/教师表条目（由于外键 ON DELETE CASCADE 可选）
+                    # 删除学生/教师表条目（由于外键 ON DELETE CASCADE 可选）
                     cursor.execute("DELETE FROM Students WHERE user_id=%s", (user_id,))
                     cursor.execute("DELETE FROM Faculty WHERE user_id=%s", (user_id,))
 
-                    # 6. 删除用户
+                    # 删除用户
                     cursor.execute("DELETE FROM Users WHERE user_id=%s", (user_id,))
                     conn.commit()
 
@@ -948,7 +947,7 @@ def admin_users():
 
                         flash(f"{role.capitalize()} added successfully")
                 # -------------------------
-                # EDIT USER  ⭐新增
+                # EDIT USER 
                 # -------------------------
                 elif action == "edit":
                     user_id = request.form["user_id"]
@@ -1024,7 +1023,7 @@ def admin_users():
                     conn.commit()
                     flash("User information updated.", "success")
             # =======================
-            # 查询用户详细信息（保持不变）
+            # 查询用户详细信息
             # =======================
             cursor.execute("""
                 SELECT u.user_id, u.username, u.password, u.role,
