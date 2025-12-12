@@ -226,7 +226,7 @@ for ar in ACCESS_RIGHTS:
     )
 
 
-# 3. Transactions & Logs
+# Transactions & Logs
 current_date = START_DATE
 delta = datetime.timedelta(days=1)
 
@@ -293,10 +293,9 @@ while current_date <= END_DATE:
                 )
     current_date += delta
 
-# 4. Inject Specific Data for Queries
+# Inject Specific Data for Queries
 
 # Query 7: "计算机学院" student night access (22:00-06:00) at Science 2 (pid=2 usually)
-# Find a CS student
 cs_students = [s for s in students if s["dept"] == "计算机学院"]
 if not cs_students:
     # Force one
@@ -314,7 +313,6 @@ sql_statements.append(
 )
 
 # Query 5: "智能学院" student max daily avg consumption merchant (2025-12-14 to 19)
-# Ensure some data there. The random generation should cover it, but let's add a big one.
 ai_students = [s for s in students if s["dept"] == "智能学院"]
 if ai_students:
     target_ai_stu = ai_students[0]
