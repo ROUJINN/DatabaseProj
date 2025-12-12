@@ -50,5 +50,4 @@ else
     echo "Task 2 output directory not found."
 fi
 
-# 删除复制过来的临时文件
 rm mapper1.py reducer1.py mapper2.py reducer2.py
