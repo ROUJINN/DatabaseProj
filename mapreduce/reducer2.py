@@ -1,13 +1,6 @@
 import sys
 from collections import defaultdict
 
-# Since we are simulating or running in a mode where we want to find the top 10 globally,
-# and standard reducers process key by key, we have a challenge.
-# In a real distributed setting, we'd need a second job to sort by count.
-# However, for this assignment, we can assume a single reducer that sees all data (sorted by user),
-# or we can accumulate everything in memory if the dataset is small enough.
-# Given the context, we'll accumulate per-user stats and then sort at the end.
-
 user_stats = defaultdict(lambda: defaultdict(int))
 
 for line in sys.stdin:
