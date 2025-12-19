@@ -67,22 +67,8 @@ WHERE t.time >= '2025-12-15 00:00:00'
 GROUP BY u.user_id
 ORDER BY total_amount DESC
 LIMIT 10; 
--- Note: The requirement says "Top 10 by amount", but then "Sort by count DESC". 
--- Usually this means "Find top 10 spenders (by amount), AND THEN for display, sort them by count".
--- If it means "Find top 10 people based on sorting criteria (Count DESC)", the wording "consumption amount top 10" conflicts.
--- I will assume: Filter Top 10 by Amount first, then order that result set by Count.
--- However, SQL execution order makes this tricky in one query without subquery.
--- Let's try a subquery approach for strict interpretation:
-/*
-SELECT * FROM (
-    SELECT ... ORDER BY SUM(amount) DESC LIMIT 10
-) as Top10
-ORDER BY trans_count DESC, name ASC
-*/
-
 
 -- 4. 查询2025年12月21日（含）之前最“繁忙”的门禁点上的所属管理单位编号以及出入次数。
--- (Assuming 2025 based on data generation context, though prompt said 2024)
 SELECT 
     ap.manager_dept_id,
     COUNT(*) as access_count

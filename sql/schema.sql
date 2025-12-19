@@ -1,8 +1,6 @@
--- Create Database
 CREATE DATABASE IF NOT EXISTS smart_campus;
 USE smart_campus;
 
--- Users Table (Base table for login)
 CREATE TABLE IF NOT EXISTS Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -10,7 +8,6 @@ CREATE TABLE IF NOT EXISTS Users (
     role ENUM('student', 'faculty', 'admin') NOT NULL
 );
 
--- Students Table
 CREATE TABLE IF NOT EXISTS Students (
     student_id VARCHAR(20) PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
@@ -24,7 +21,6 @@ CREATE TABLE IF NOT EXISTS Students (
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Faculty Table
 CREATE TABLE IF NOT EXISTS Faculty (
     staff_id VARCHAR(20) PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
@@ -37,7 +33,6 @@ CREATE TABLE IF NOT EXISTS Faculty (
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Cards Table
 CREATE TABLE IF NOT EXISTS Cards (
     card_id VARCHAR(20) PRIMARY KEY,
     user_id INT NOT NULL,
@@ -48,14 +43,12 @@ CREATE TABLE IF NOT EXISTS Cards (
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Access Points Table
 CREATE TABLE IF NOT EXISTS AccessPoints (
     point_id INT AUTO_INCREMENT PRIMARY KEY,
     building_name VARCHAR(50) NOT NULL,
     manager_dept_id VARCHAR(20)
 );
 
--- Transactions Table
 CREATE TABLE IF NOT EXISTS Transactions (
     trans_id INT AUTO_INCREMENT PRIMARY KEY,
     card_id VARCHAR(20) NOT NULL,
@@ -69,30 +62,24 @@ CREATE TABLE IF NOT EXISTS Transactions (
     
 );
 
-
--- Terminals Table: 管理各商户消费终端及扣费规则
 CREATE TABLE IF NOT EXISTS Terminals (
-    terminal_id VARCHAR(20) PRIMARY KEY,         -- 终端编号
-    merchant_name VARCHAR(50) NOT NULL,         -- 商户名称
-    category VARCHAR(20) DEFAULT 'general',     -- 类别：食堂/超市/洗浴等
-    charge_rule VARCHAR(100),                   -- 扣费规则描述，例如JSON或文本
-    manager_dept VARCHAR(50)                     -- 管理该终端的部门
+    terminal_id VARCHAR(20) PRIMARY KEY,
+    merchant_name VARCHAR(50) NOT NULL,
+    category VARCHAR(20) DEFAULT 'general',
+    charge_rule VARCHAR(100),
+    manager_dept VARCHAR(50)
 );
 
-
--- AccessRights Table: 管理门禁访问权限（按个人或部门）
 CREATE TABLE IF NOT EXISTS AccessRights (
     right_id INT AUTO_INCREMENT PRIMARY KEY,
-    role_type ENUM('student','faculty','department') NOT NULL, -- 授权对象类型
-    role_value VARCHAR(50) NOT NULL,                            -- 授权对象：student_id / staff_id / department_name
-    point_id INT NOT NULL,                                      -- 门禁点ID
+    role_type ENUM('student','faculty','department') NOT NULL,
+    role_value VARCHAR(50) NOT NULL,
+    point_id INT NOT NULL,
     FOREIGN KEY (point_id) REFERENCES AccessPoints(point_id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
 );
 
-
--- Access Logs Table
 CREATE TABLE IF NOT EXISTS AccessLogs (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     card_id VARCHAR(20) NOT NULL,
@@ -107,7 +94,6 @@ CREATE TABLE IF NOT EXISTS AccessLogs (
         ON DELETE CASCADE
 );
 
--- User Messages (For Trigger Output)
 CREATE TABLE IF NOT EXISTS UserMessages (
     msg_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
@@ -121,10 +107,10 @@ CREATE TABLE IF NOT EXISTS UserMessages (
 CREATE TABLE IF NOT EXISTS CardStatusRequests (
     request_id INT AUTO_INCREMENT PRIMARY KEY,
     card_id VARCHAR(20) NOT NULL,
-    requested_by INT NOT NULL,           -- 教职工 user_id
+    requested_by INT NOT NULL,
     new_status ENUM('normal','lost','frozen') NOT NULL,
     request_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    approved_by INT,                     -- admin user_id
+    approved_by INT,
     approved_time DATETIME,
     status ENUM('pending','approved','rejected') DEFAULT 'pending',
     FOREIGN KEY (card_id) REFERENCES Cards(card_id) ON DELETE CASCADE,
@@ -132,14 +118,11 @@ CREATE TABLE IF NOT EXISTS CardStatusRequests (
     FOREIGN KEY (approved_by) REFERENCES Users(user_id) ON DELETE SET NULL
 );
 
-
--- Indexes for Optimization
 CREATE INDEX idx_trans_time ON Transactions(time);
 CREATE INDEX idx_trans_card ON Transactions(card_id);
 CREATE INDEX idx_student_dept ON Students(department);
 CREATE INDEX idx_access_time ON AccessLogs(time);
 
--- Trigger
 DELIMITER //
 CREATE TRIGGER after_transaction_insert
 AFTER INSERT ON Transactions
@@ -150,22 +133,17 @@ BEGIN
     DECLARE uid INT;
     
     IF NEW.trans_type = 'payment' THEN
-        -- Get User ID and Balance
         SELECT user_id, balance INTO uid, current_balance FROM Cards WHERE card_id = NEW.card_id;
         
-        -- Calculate Daily Total Payment
         SELECT SUM(amount) INTO daily_total 
         FROM Transactions 
         WHERE card_id = NEW.card_id 
           AND trans_type = 'payment'
           AND DATE(time) = DATE(NEW.time);
           
-        -- Insert Message
         INSERT INTO UserMessages (user_id, message) 
         VALUES (uid, CONCAT('Today Total Payment: ', IFNULL(daily_total, 0), ', Current Balance: ', IFNULL(current_balance, 0)));
         
-        -- Update Balance (Optional, assuming app does it, but let's do it here for completeness if app relies on DB)
-        -- UPDATE Cards SET balance = balance - NEW.amount WHERE card_id = NEW.card_id;
     END IF;
 END;
 //
