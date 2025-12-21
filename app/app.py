@@ -15,13 +15,13 @@ from flask import (
 )
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key" 
+app.secret_key = "your_secret_key"
 
 # Database Configuration
 db_config = {
     "host": "localhost",
     "user": "root",
-    "password": "123456",  
+    "password": "123456",
     "database": "smart_campus",
     "cursorclass": pymysql.cursors.DictCursor,
 }
@@ -739,13 +739,13 @@ def faculty_export_access_report():
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            #获取教师所属学院
+            # 获取教师所属学院
             cursor.execute(
                 "SELECT department FROM Faculty WHERE user_id=%s", (session["user_id"],)
             )
             dept = cursor.fetchone()["department"]
 
-            #查询该院学生的通行记录
+            # 查询该院学生的通行记录
             cursor.execute(
                 """
                 SELECT 
@@ -765,7 +765,7 @@ def faculty_export_access_report():
             )
             access_records = cursor.fetchall()
 
-            #写入 CSV
+            # 写入 CSV
             si = io.StringIO()
             cw = csv.writer(si)
             cw.writerow(["Student ID", "Name", "Time", "Direction", "Location"])
@@ -781,7 +781,7 @@ def faculty_export_access_report():
                     ]
                 )
 
-            #返回 CSV 文件
+            # 返回 CSV 文件
             output = make_response(si.getvalue())
             output.headers["Content-Disposition"] = (
                 "attachment; filename=access_report.csv"
@@ -947,7 +947,7 @@ def admin_users():
 
                         flash(f"{role.capitalize()} added successfully")
                 # -------------------------
-                # EDIT USER 
+                # EDIT USER
                 # -------------------------
                 elif action == "edit":
                     user_id = request.form["user_id"]

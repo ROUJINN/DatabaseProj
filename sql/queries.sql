@@ -80,8 +80,7 @@ ORDER BY access_count DESC
 LIMIT 1;
 
 
--- 5. 找出2025年12月14日到19日（含）期间，“智能学院”学生每天的平均消费金额最大的商户名称以及其所有相关交易
--- Step 1: Find the merchant
+-- 5. 找出2025年12月14日到19日（含）期间，“智能学院”学生每天的平均消费金额最大的商户名称以及其所有相关交易  
 WITH DailyMerchantAvg AS (
     SELECT 
         t.merchant_name,
@@ -97,7 +96,6 @@ WITH DailyMerchantAvg AS (
     ORDER BY avg_amount DESC
     LIMIT 1
 )
--- Step 2: Get transactions for that merchant (in that date range? or all? Assuming in range)
 SELECT t.* 
 FROM Transactions t
 JOIN DailyMerchantAvg dma ON t.merchant_name = dma.merchant_name
